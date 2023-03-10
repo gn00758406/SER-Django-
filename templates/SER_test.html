@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>SER</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+        crossorigin="anonymous">
+	
+	<link rel="stylesheet" href="//use.fontawesome.com/releases/v6.1.1/css/all.css">
+</head>
+<body>
+    
+	<h1 style="text-align:center"><br><span style="font-family:DFKai-sb">中文醫療問答</span><br><br></h1>
+	<form action="/SER_test_view/" method="POST" name="form1">
+        {% csrf_token %}  <!-- 啟動CSRF防護，保護伺服器避免被攻擊 -->
+		<div class="container">
+		<table  class="table table-striped">
+        
+		<tr>
+		<td style="vertical-align: middle !important;"  width="100" height="100"><span style="font-family:DFKai-sb">輸入句子</span></td>
+		<td style="vertical-align: middle !important;text-align: center;"width="800"  height="100"><textarea class="form-control" name="input_sentence">請問哪一個專科可以治療遺傳性狐臭所帶來的下體強烈異味？</textarea>
+		</td>
+		<td  style="vertical-align: middle !important;text-align: center;" width="100" height="100"><button type="submit" class="btn btn-secondary">送出</button></td>
+		<td style="vertical-align: middle !important;text-align: center;" width="200" height="100"><span style="font-family:DFKai-sb">
+		<div style="text-align:right"><span style="font-family:DFKai-sb;color: green">綠色 : Label 2</span></div>
+		<div style="text-align:right"><span style="font-family:DFKai-sb;color: blue">藍色 : Label 1</span></div>
+		<div style="text-align:right"><span style="font-family:DFKai-sb;color: red">紅色 : Label 0</span></div>
+		</td>
+		</tr>
+		
+		</table>
+
+</div>
+		
+		<table class="table table-bordered border-primary;" style="margin:1%;width:98%;">
+		
+        <tr>
+		<td style="vertical-align: middle !important;text-align: center;" width="200" height="200"><span style="font-family:DFKai-sb">Sentence-BERT輸出答案</span></td>
+		<td style="vertical-align: middle !important;text-align: center;" width="200" height="200"><span style="font-family:DFKai-sb">SER輸出答案</span></td>
+		<td style="vertical-align: middle !important;text-align: center;" width="200" height="200"><span style="font-family:DFKai-sb">BM25輸出答案</span></td>
+		
+		</tr>
+		
+        <tr>
+	
+		<td><span style="font-family:DFKai-sb;">
+	
+		
+		{% for answer,id,label,name,date in zip_SBERT%}
+		{% if label == 0 %}
+		<span class="SBERT-item" style="color: red">{{name}}醫師 | {{date}} | </span>
+		<a href="https://expert.med-net.com/questiondetail/{{id}}" class="btn btn-info btn-sm" role="button"><i class="fa-solid fa-comment-medical"></i></a><br>
+		<span class="SBERT-item" style="color: red; ">答:{{answer}}</span><br>
+		{% endif %}
+		
+		{% if label == 1 %}
+		<span class="SBERT-item" style="color: blue">{{name}}醫師 | {{date}} | </span>
+		<a href="https://expert.med-net.com/questiondetail/{{id}}" class="btn btn-info btn-sm" role="button"><i class="fa-solid fa-comment-medical"></i></a><br>
+		<span class="SBERT-item" style="color: blue; ">答:{{answer}} <br></span>
+		{% endif %}
+		
+		{% if label == 2 %}
+		<span class="SBERT-item" style="color: green">{{name}}醫師 | {{date}} | </span>
+		<a href="https://expert.med-net.com/questiondetail/{{id}}" class="btn btn-info btn-sm" role="button"><i class="fa-solid fa-comment-medical"></i></a><br>
+		<span class="SBERT-item" style="color: green;">答:{{answer}} <br></span>{% endif %}
+		{% endfor %}
+		</td>
+		
+		<td><span style="font-family:DFKai-sb">
+		{% for answer,id,label,name,date in zip_SER%}
+		
+		{% if label == 0 %}
+		<span class="SER-item" style="color: red">{{name}}醫師 | {{date}} | </span>
+		<a href="https://expert.med-net.com/questiondetail/{{id}}" class="btn btn-info btn-sm" role="button"><i class="fa-solid fa-comment-medical"></i></a><br>
+		<span class="SER-item" style="color: red">答:{{answer}} <br></span>
+		{% endif %}
+		
+		{% if label == 1 %}<span class="SER-item" style="color: blue">答:{{answer}} <br><br></span>
+		<span class="SER-item" style="color: blue">{{name}}醫師 | {{date}} | </span>
+		<a href="https://expert.med-net.com/questiondetail/{{id}}" class="btn btn-info btn-sm" role="button"><i class="fa-solid fa-comment-medical"></i></a><br>
+		<span class="SER-item" style="color: blue" >答:{{answer}} <br></span>
+		{% endif %}
+		
+		{% if label == 2 %}
+		<span class="SER-item" style="color: green">{{name}}醫師 | {{date}} | </span>
+		<a href="https://expert.med-net.com/questiondetail/{{id}}" class="btn btn-info btn-sm" role="button"><i class="fa-solid fa-comment-medical"></i></a><br>
+		<span class="SER-item" style="color: green" >答:{{answer}} <br></span>
+		{% endif %}
+		
+		{% endfor %}
+		</td>
+		
+		<td width="30%"  ><span style="font-family:DFKai-sb">
+		
+		{% for answer,id,label,name,date in zip_BM25%}
+		{% if label == 0 %}
+		<span class="BM25-item" style="color: red">{{name}}醫師 | {{date}} | </span>
+		<a href="https://expert.med-net.com/questiondetail/{{id}}" class="btn btn-info btn-sm" role="button"><i class="fa-solid fa-comment-medical"></i></a><br>
+		<span class="BM25-item" style="color: red">答:{{answer}} <br></span>
+		{% endif %}
+		
+		{% if label == 1 %}
+		<span class="BM25-item" style="color: blue">{{name}}醫師 | {{date}} | </span>
+		<a href="https://expert.med-net.com/questiondetail/{{id}}" class="btn btn-info btn-sm" role="button"><i class="fa-solid fa-comment-medical"></i></a><br>
+		<span class="BM25-item" style="color: blue">答:{{answer}} <br></span>
+		{% endif %}
+		{% if label == 2 %}
+		<span class="BM25-item" style="color: green">{{name}}醫師 | {{date}} | </span>
+		<a href="https://expert.med-net.com/questiondetail/{{id}}" class="btn btn-info btn-sm" role="button"><i class="fa-solid fa-comment-medical"></i></a><br>
+		<span class="BM25-item" style="color: green">答:{{answer}} <br></span>
+		{% endif %}
+		{% endfor %}
+		</td>
+		</tr>
+		
+
+		</table>
+		
+    </form>
+	
+
+	
+		
+   
+	
+</body>
+</html>
